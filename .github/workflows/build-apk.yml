@@ -1,0 +1,50 @@
+name: Build Android APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Set up Flutter 3.24.5
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.5"
+          channel: stable
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Analyze
+        run: flutter analyze
+      - name: Build release APK
+        run: flutter build apk --release --verbose > build.log 2>&1; echo "BUILD_EXIT=$?" >> "$GITHUB_ENV"; test -f build/app/outputs/flutter-apk/app-release.apk
+      - name: Publish build log on failure
+        if: failure()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-failed-${{ github.run_number }}
+          name: Build failed (run ${{ github.run_number }})
+          body: The APK build failed. The attached build.log shows the error.
+          files: build.log
+          draft: false
+          prerelease: true
+      - name: Publish APK as a release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-build-${{ github.run_number }}
+          name: Snake Infinity APK (build ${{ github.run_number }})
+          body: |
+            Snake Infinity: 3D Adventure — install this APK on any Android phone. No account or internet needed after install.
+          files: build/app/outputs/flutter-apk/app-release.apk
+          draft: false
+          prerelease: false

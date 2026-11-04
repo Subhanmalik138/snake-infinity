@@ -1,0 +1,23 @@
+name: snake_infinity
+description: "Snake Infinity: 3D Adventure - unlimited levels, power-ups, 4 game modes."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.3.0
+  just_audio: ^0.9.46
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/sounds/
